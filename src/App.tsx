@@ -30,7 +30,7 @@ export default function App() {
     }else{ // User Routes
       return(
         <Routes>
-          <Route path="/" element={<Home_User/>} /> {/** home */}
+          <Route path="/" element={<All_Account_UI/>} /> {/** home */}
           <Route path="/profile/:email" element={<User_Profile_UI/>} /> {/** user profile */}
           <Route path="/AllMyAccount" element={<All_Account_UI/>} /> {/** All Account */}
           <Route path="/UnsoldAccount" element={<Order_Account_UI/>} /> {/** All Account */}

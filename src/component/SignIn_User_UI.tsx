@@ -313,7 +313,7 @@ function SignIn_User() {
           sm={4}
           md={7}
           sx={{
-            backgroundImage: "url(https://pixabay.com/get/g935d7c54b4a3145951f813a8dacff4399e58e895f1924f81ab8b24dab4ff3682054de6a3ed37c91ca121371e6ccf62fd.png)",
+            backgroundImage: "url(https://bs-uploads.toptal.io/blackfish-uploads/components/seo/content/og_image_file/og_image/1264081/0712-Bad_Practices_in_Database_Design_-_Are_You_Making_These_Mistakes_Dan_Social-754bc73011e057dc76e55a44a954e0c3.png)",
             backgroundRepeat: "no-repeat",
             backgroundColor: (t) =>
               t.palette.mode === "light"
