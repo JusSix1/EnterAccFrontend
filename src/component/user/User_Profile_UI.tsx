@@ -108,7 +108,6 @@ function User_Profile(){
 
     const getUser = async () => {
         const apiUrl = ip_address() + "/user/"+email; // email คือ email ที่ผ่านเข้ามาทาง parameter
-        console.log(apiUrl)
         const requestOptions = {
             method: "GET",
             headers: {

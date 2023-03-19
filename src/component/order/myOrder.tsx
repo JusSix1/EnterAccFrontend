@@ -8,7 +8,6 @@ import { AccountsInterface } from '../../models/account/IAccount';
 import { OrdersInterface } from '../../models/order/IOrder';
 import UserFullAppBar from '../UserFullAppBar';
 import moment from 'moment';
-import dayjs, { Dayjs } from 'dayjs';
 
 export default function My_Order_UI() {
     const [account, setAccount] = React.useState<AccountsInterface[]>([]);
@@ -97,6 +96,7 @@ export default function My_Order_UI() {
     };
 
     const ExportAsTextFile = async () => {
+        setDialogLoadOpen(true);
         var data = ""
         for (var i = 0; i < account.length; i++) {
             data = data + "Twitter Account:  " + account[i].Twitter_Account + "\n"
@@ -105,8 +105,6 @@ export default function My_Order_UI() {
             data = data + "Email Password:   " + account[i].Email_Password + "\n"
             data = data + "Phone Number:     " + account[i].Phone_Number + "\n\n"
         }
-
-        console.log(data)
 
         var a = document.createElement("a");
 
@@ -116,9 +114,11 @@ export default function My_Order_UI() {
         a.download = "Twitter Order ID " + account[0].Order_ID;
         a.click();
         window.URL.revokeObjectURL(url);
+        setDialogLoadOpen(false);
     };
 
     const CopyToClipboard = async () => {
+        setDialogLoadOpen(true);
         var data = ""
         for (var i = 0; i < account.length; i++) {
             data = data + "Twitter Account:  " + account[i].Twitter_Account + "\n"
@@ -128,6 +128,7 @@ export default function My_Order_UI() {
             data = data + "Phone Number:     " + account[i].Phone_Number + "\n\n"
         }
         await navigator.clipboard.writeText(data);
+        setDialogLoadOpen(false);
     };
       
     const getAccountInOrder= async (id: number) => {
@@ -171,7 +172,9 @@ export default function My_Order_UI() {
 
     React.useEffect(() => {
         const fetchData = async () => {
+            setDialogLoadOpen(true);
             await getMyOrder();
+            setDialogLoadOpen(false);
         }
         fetchData();
     }, []);

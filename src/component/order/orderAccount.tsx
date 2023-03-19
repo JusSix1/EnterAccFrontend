@@ -153,7 +153,9 @@ export default function Order_Account_UI() {
 
     React.useEffect(() => {
         const fetchData = async () => {
+            setDialogLoadOpen(true);
             await getUnsoldAccount();
+            setDialogLoadOpen(false);
         }
         fetchData();
     }, []);

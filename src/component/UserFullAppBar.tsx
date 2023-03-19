@@ -86,7 +86,6 @@ function UserFullAppBar() {
 
   const getUserProfilePicture = async () => {
     const apiUrl = ip_address() + "/usersprofilepicture/" + localStorage.getItem('email') ; // email คือ email ที่ผ่านเข้ามาทาง parameter
-    console.log(apiUrl)
     const requestOptions = {
         method: "GET",
         headers: {

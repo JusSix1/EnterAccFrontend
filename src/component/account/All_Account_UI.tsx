@@ -232,7 +232,9 @@ export default function All_Account_UI() {
 
     React.useEffect(() => {
         const fetchData = async () => {
+            setDialogLoadOpen(true);
             await getAccount();
+            setDialogLoadOpen(false);
         }
         fetchData();
     }, []);
