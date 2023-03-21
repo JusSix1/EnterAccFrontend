@@ -25,9 +25,9 @@ import ViewCarouselIcon from '@mui/icons-material/ViewCarousel';
 import TrendingUpTwoToneIcon from '@mui/icons-material/TrendingUpTwoTone';
 
 import { Link as RouterLink } from "react-router-dom";
-import { UsersInterface } from '../models/user/IUser';
+import { UsersInterface } from '../../models/user/IUser';
 // import { AdminsInterface } from '../models/admin/IAdmin';
-import ip_address from './ip';
+import ip_address from '../ip';
 import { Avatar } from '@mui/material';
 
 function UserFullAppBar() {
@@ -39,29 +39,26 @@ function UserFullAppBar() {
   };
 
   function drawerList() {
-    if (localStorage.getItem("position") == "Admin") {
-    } else { // User Drawer
-      return (
-        <List sx={{ width: "100%" }}>
+    return (
+      <List sx={{ width: "100%" }}>
 
-          <ListItem button component={RouterLink} to="/AllMyAccount">
-            <ViewListIcon />
-            <ListItemText primary="All My Account" sx={{ paddingLeft: 1 }} />
-          </ListItem>
+        <ListItem button component={RouterLink} to="/AllMyAccount">
+          <ViewListIcon />
+          <ListItemText primary="All My Account" sx={{ paddingLeft: 1 }} />
+        </ListItem>
 
-          <ListItem button component={RouterLink} to="/UnsoldAccount">
-            <MoneyOffIcon />
-            <ListItemText primary="Unsold Account" sx={{ paddingLeft: 1 }} />
-          </ListItem>
+        <ListItem button component={RouterLink} to="/UnsoldAccount">
+          <MoneyOffIcon />
+          <ListItemText primary="Unsold Account" sx={{ paddingLeft: 1 }} />
+        </ListItem>
 
-          <ListItem button component={RouterLink} to="/MyOrder">
-            <GradingIcon />
-            <ListItemText primary="My Order" sx={{ paddingLeft: 1 }} />
-          </ListItem>
+        <ListItem button component={RouterLink} to="/MyOrder">
+          <GradingIcon />
+          <ListItemText primary="My Order" sx={{ paddingLeft: 1 }} />
+        </ListItem>
 
-        </List>
-      );
-    }
+      </List>
+    );
   }
 
   function myProfileUser() {
@@ -101,26 +98,7 @@ function UserFullAppBar() {
                 setUser(res.data);
             }
         });
-};
-
-  // async function GetAdmin() {
-  //   const apiUrl = "http://localhost:8080/admin/" + localStorage.getItem("email");
-  //   const requestOptions = {
-  //     method: "GET",
-  //     headers: {
-  //       Authorization: `Bearer ${localStorage.getItem("token")}`,
-  //       "Content-Type": "application/json",
-  //     },
-  //   };
-
-  //   await fetch(apiUrl, requestOptions)
-  //     .then((response) => response.json())
-  //     .then((res) => {
-  //       if (res.data) {
-  //         setAdmin(res.data);
-  //       }
-  //     });
-  // };
+  };
 
   React.useEffect(() => {
     const fetchData = async () => {

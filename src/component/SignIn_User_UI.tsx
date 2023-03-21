@@ -21,6 +21,7 @@ import dayjs, { Dayjs } from "dayjs";
 import { SigninUserInterface } from "../models/ISignIn_User";
 import { GendersInterface } from "../models/user/IGender";
 import ip_address from "./ip";
+import { SigninAdminInterface } from "../models/ISignIn_Admin";
 
 const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
   props,
@@ -52,9 +53,10 @@ function SignIn_User() {
   const [phoneNumber, setPhoneNumber] = React.useState<string | null>(null);
   // Sign in
   const [signin, setSignin] = useState<Partial<SigninUserInterface>>({});
-  const [signinAdmin, setSigninAdmin] = useState<Partial<SigninUserInterface>>({});
+  const [signinAdmin, setSigninAdmin] = useState<Partial<SigninAdminInterface>>({});
   const [success, setSuccess] = useState(false);
-  const [error, setError] = useState(false);
+  const [errorUser, setErrorUser] = useState(false);
+  const [errorAdmin, setErrorAdmin] = useState(false);
 
   async function LoginUser(data: SigninUserInterface) {
     const apiUrl = ip_address();
@@ -69,9 +71,8 @@ function SignIn_User() {
       .then((res) => {
         if (res.data) {
           localStorage.setItem("token", res.data.token);
-          localStorage.setItem("uid", res.data.id);
           localStorage.setItem("email", res.data.email);
-          localStorage.setItem("position", res.data.position);
+          localStorage.setItem("Position", res.data.position);
           return res.data;
         } else {
           return false;
@@ -81,32 +82,30 @@ function SignIn_User() {
     return res;
   }
 
-  // async function LoginAdmin(data: SigninUserInterface) {
-  //   const apiUrl = ip_address() + ":8080";
-  //   const requestOptions = {
-  //     method: "POST",
-  //     headers: { "Content-Type": "application/json" },
-  //     body: JSON.stringify(data),
-  //   };
+  async function LoginAdmin(data: SigninUserInterface) {
+    const apiUrl = ip_address();
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    };
   
-  //   let res = await fetch(`${apiUrl}/login/admin`, requestOptions)
-  //     .then((response) => response.json())
-  //     .then((res) => {
-  //       if (res.data) {
-  //         localStorage.setItem("token", res.data.token);
-  //         localStorage.setItem("aid", res.data.id);
-  //         localStorage.setItem("name", res.data.name);
-  //         localStorage.setItem("email", res.data.email);
-  //         localStorage.setItem("position", res.data.position);
-  //         return res.data;
-  //       } else {
-  //         console.log(res.error);
-  //         return false;
-  //       }
-  //     });
+    let res = await fetch(`${apiUrl}/login/admin`, requestOptions)
+      .then((response) => response.json())
+      .then((res) => {
+        if (res.data) {
+          localStorage.setItem("token", res.data.token);
+          localStorage.setItem("Admin_Name", res.data.admin_name);
+          localStorage.setItem("Position", res.data.position);
+          return res.data;
+        } else {
+          console.log(res.error);
+          return false;
+        }
+      });
       
-  //   return res;
-  // }
+    return res;
+  }
 
   const getGender = async () => {
     const apiUrl = ip_address() + "/genders";
@@ -135,7 +134,7 @@ function SignIn_User() {
   const handleInputChangeAdmin = (
     event: React.ChangeEvent<{ id?: string; value: any }>
   ) => {
-    const id = event.target.id as keyof typeof signin;
+    const id = event.target.id as keyof typeof signinAdmin;
     const { value } = event.target;
     setSigninAdmin({ ...signinAdmin, [id]: value });
   };
@@ -148,7 +147,8 @@ function SignIn_User() {
       return;
     }
     setSuccess(false);
-    setError(false);
+    setErrorUser(false);
+    setErrorAdmin(false);
     setRegisterSuccess(false);
     setRegisterError(false);
   };
@@ -188,21 +188,21 @@ function SignIn_User() {
         window.location.replace("/AllMyAccount");
       }, 1000);
     } else {
-      setError(true);
+      setErrorUser(true);
     }
   };
 
-  // const submitAdmin = async () => {
-  //   let res = await LoginAdmin(signinAdmin);
-  //   if (res) {
-  //     setSuccess(true);
-  //     setTimeout(() => {
-  //       window.location.reload();
-  //     }, 1000);
-  //   } else {
-  //     setError(true);
-  //   }
-  // };
+  const submitAdmin = async () => {
+    let res = await LoginAdmin(signinAdmin);
+    if (res) {
+      setSuccess(true);
+      setTimeout(() => {
+        window.location.replace("/All-Admin");
+      }, 1000);
+    } else {
+      setErrorAdmin(true);
+    }
+  };
 
   const createAccount = () => {
     const signout = () => {
@@ -272,13 +272,24 @@ function SignIn_User() {
         </Snackbar>
         <Snackbar
           id="error"
-          open={error}
+          open={errorUser}
           autoHideDuration={3000}
           onClose={handleClose}
           anchorOrigin={{ vertical: "top", horizontal: "center" }}
         >
           <Alert onClose={handleClose} severity="error">
             Email or Password invalid
+          </Alert>
+        </Snackbar>
+        <Snackbar
+          id="error"
+          open={errorAdmin}
+          autoHideDuration={3000}
+          onClose={handleClose}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        >
+          <Alert onClose={handleClose} severity="error">
+            Admin Name or Password invalid
           </Alert>
         </Snackbar>
 
@@ -556,12 +567,12 @@ function SignIn_User() {
                     margin="normal"
                     required
                     fullWidth
-                    id="Email"
-                    label="Email"
-                    name="Email"
-                    autoComplete="Email"
+                    id="Admin_Name"
+                    label="Admin Name"
+                    name="Admin_Name"
+                    autoComplete="Admin_Name"
                     autoFocus
-                    value={signinAdmin.Email || ""}
+                    value={signinAdmin.Admin_Name}
                     onChange={handleInputChangeAdmin}
                   />
                   <TextField
@@ -573,7 +584,7 @@ function SignIn_User() {
                     type="password"
                     id="Password"
                     autoComplete="current-password"
-                    value={signinAdmin.Password || ""}
+                    value={signinAdmin.Password}
                     onChange={handleInputChangeAdmin}
                   />
                 </Box>
@@ -583,7 +594,7 @@ function SignIn_User() {
         </DialogContent>
         <DialogActions>
             <Button onClick={handleDialogAdminClose} color="error">Cancel</Button>
-            {/* <Button onClick={submitAdmin} autoFocus>SIGN IN</Button> */}
+            <Button onClick={submitAdmin} autoFocus>SIGN IN</Button>
         </DialogActions>
       </Dialog>
 

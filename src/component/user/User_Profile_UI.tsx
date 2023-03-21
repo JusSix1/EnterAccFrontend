@@ -15,7 +15,7 @@ import { useParams } from 'react-router-dom';
 
 import { UsersInterface } from '../../models/user/IUser';
 import ip_address from '../ip';
-import UserFullAppBar from '../UserFullAppBar';
+import UserFullAppBar from '../FullAppBar/UserFullAppBar';
 
 
 const ITEM_HEIGHT = 40;

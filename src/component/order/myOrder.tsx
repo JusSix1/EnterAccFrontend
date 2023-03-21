@@ -6,7 +6,7 @@ import Moment from 'moment';
 import ip_address from '../ip';
 import { AccountsInterface } from '../../models/account/IAccount';
 import { OrdersInterface } from '../../models/order/IOrder';
-import UserFullAppBar from '../UserFullAppBar';
+import UserFullAppBar from '../FullAppBar/UserFullAppBar';
 import moment from 'moment';
 
 export default function My_Order_UI() {
@@ -266,7 +266,7 @@ export default function My_Order_UI() {
 
                                     onCellDoubleClick={async (params, event) => {
                                         await navigator.clipboard.writeText(String(params.formattedValue));
-                                        window.open("https://shadowban.yuzurisa.com/" + params.formattedValue , "_blank");
+                                        window.open("https://hisubway.online/shadowban/?username=" + params.formattedValue , "_blank");
                                     }}
                                     />
                              </div>

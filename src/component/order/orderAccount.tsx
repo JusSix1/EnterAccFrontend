@@ -6,7 +6,7 @@ import dayjs, { Dayjs } from 'dayjs';
 
 import ip_address from '../ip';
 import { AccountsInterface } from '../../models/account/IAccount';
-import UserFullAppBar from '../UserFullAppBar';
+import UserFullAppBar from '../FullAppBar/UserFullAppBar';
 
 export default function Order_Account_UI() {
     const [account, setAccount] = React.useState<AccountsInterface[]>([]);
@@ -32,7 +32,6 @@ export default function Order_Account_UI() {
             <GridToolbarExport 
                 csvOptions={{
                     fileName: 'EntaccMyAccount '+Moment(year?.toDate()).format('DD-MMMM-YYYY h.mm.ssa'),
-                    delimiter: ';',
                     utf8WithBom: true,
                 }}
             />
@@ -208,7 +207,7 @@ export default function Order_Account_UI() {
                             disableRowSelectionOnClick
                             onCellDoubleClick={async (params, event) => {
                                 await navigator.clipboard.writeText(String(params.formattedValue));
-                                window.open("https://shadowban.yuzurisa.com/" + params.formattedValue , "_blank");
+                                window.open("https://hisubway.online/shadowban/?username=" + params.formattedValue , "_blank");
                               }}
                         />
                 </div>

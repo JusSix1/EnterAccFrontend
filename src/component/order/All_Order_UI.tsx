@@ -5,11 +5,11 @@ import AdminFullAppBar from '../FullAppBar/AdminFullAppBar';
 import ip_address from '../ip';
 import Moment from 'moment';
 import dayjs, { Dayjs } from 'dayjs';
-import { AccountsImportInterface } from '../../models/account/IAccount_Import';
+import { OrdersInterface } from '../../models/order/IOrder';
 
-export default function All_Admin_UI() {
+export default function All_Order_UI() {
     
-    const [account, setAccount] = React.useState<AccountsImportInterface[]>([]);
+    const [order, setOrder] = React.useState<OrdersInterface[]>([]);
 
     const [date, setDate] = React.useState<Dayjs | null>(dayjs());
 
@@ -29,7 +29,7 @@ export default function All_Admin_UI() {
             <GridToolbarDensitySelector />
             <GridToolbarExport 
                 csvOptions={{
-                    fileName: 'All Account '+ Moment(date?.toDate()).format('DD-MMMM-YYYY h.mm.ssa'),
+                    fileName: 'All Order '+ Moment(date?.toDate()).format('DD-MMMM-YYYY h.mm.ssa'),
                     utf8WithBom: true,
                 }}
             />
@@ -39,16 +39,7 @@ export default function All_Admin_UI() {
 
     const columns: GridColDef[] = [
         { field: 'ID', headerName: 'ID', width: 70},
-        { field: 'ID_Account', headerName: 'ID_Account', width: 70},
         { field: 'User_ID', headerName: 'User_ID', width: 70},
-        { field: 'Years', headerName: 'Years', width: 90, },
-        { field: 'Account_Status_ID', headerName: 'Account_Status_ID', width: 100 },
-        { field: 'Order_ID', headerName: 'Order_ID', width: 90 },
-        { field: 'Twitter_Account', headerName: 'Twitter_Account', width: 200 },
-        { field: 'Twitter_Password', headerName: 'Twitter_Password', width: 200 },
-        { field: 'Email', headerName: 'Email', width: 200 },
-        { field: 'Email_Password', headerName: 'Email_Password', width: 200 },
-        { field: 'Phone_Number', headerName: 'Phone_Number', width: 200 },
     ];  
 
     const handleClose = (
@@ -88,8 +79,8 @@ export default function All_Admin_UI() {
         .map((column) => column.field);
     };
 
-    const getAllAccount = async () => {
-        const apiUrl = ip_address() + "/all-account-admin";
+    const getAllOrder = async () => {
+        const apiUrl = ip_address() + "/all-order-admin";
         const requestOptions = {
             method: "GET",
             headers: {
@@ -102,7 +93,7 @@ export default function All_Admin_UI() {
             .then((response) => response.json())
             .then((res) => {
                 if (res.data) {
-                    setAccount(res.data); 
+                    setOrder(res.data); 
                 }
             });
     };
@@ -110,7 +101,7 @@ export default function All_Admin_UI() {
     React.useEffect(() => {
         const fetchData = async () => {
             setDialogLoadOpen(true);
-            await getAllAccount();
+            await getAllOrder();
             setDialogLoadOpen(false);
         }
         fetchData();
@@ -147,7 +138,7 @@ export default function All_Admin_UI() {
             <Grid container sx={{ padding: 2 }}>
                 <div style={{ height: 540, width: '100%' }}>
                     <DataGridPro
-                        rows={account}
+                        rows={order}
                         getRowId={(row) => row.ID}
                         slots={{ toolbar: CustomToolbar }}
                         columns={columns}
