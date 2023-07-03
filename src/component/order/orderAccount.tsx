@@ -7,19 +7,30 @@ import dayjs, { Dayjs } from 'dayjs';
 import ip_address from '../ip';
 import { AccountsInterface } from '../../models/account/IAccount';
 import UserFullAppBar from '../FullAppBar/UserFullAppBar';
+import { AccountsImportInterface } from '../../models/account/IAccount_Import';
 
 export default function Order_Account_UI() {
     const [account, setAccount] = React.useState<AccountsInterface[]>([]);
+    const [importAccount, setImportAccount] = React.useState<AccountsImportInterface[][]>([]);
 
     const [success, setSuccess] = React.useState(false);
     const [error, setError] = React.useState(false);
     const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
     const [dialogLoadOpen, setDialogLoadOpen] = React.useState(false);
     const [dialogOrderOpen, setDialogOrderOpen] = React.useState(false);
+    const [dialogCreateOpen, setDialogCreateOpen] = React.useState(false);
 
     const [year, setYear] = React.useState<Dayjs | null>(dayjs());
 
     const [rowSelectionModel, setRowSelectionModel] = React.useState<GridRowSelectionModel>([]);
+    
+    const handleDialogCreateClickOpen = () => {
+        setDialogCreateOpen(true);
+    };
+
+    const handleDialogCreateClickClose = () => {
+        setDialogCreateOpen(false);
+    };
 
     Moment.locale('th');
 
@@ -150,6 +161,52 @@ export default function Order_Account_UI() {
         setDialogLoadOpen(false);
     }
 
+    const CreateAccount = async () => {    
+
+        setDialogLoadOpen(true);
+
+        var dataArr = [];
+
+        for (var i = 1; i < importAccount.length; i++) {
+            dataArr.push({
+                Email_User:         localStorage.getItem('email'),
+                Twitter_Account:    importAccount[i][0],
+                Twitter_Password:   importAccount[i][1],
+                Email_Accont:       importAccount[i][2],
+                Email_Password:     importAccount[i][3],
+                Phone_Number:       importAccount[i][4],
+                Years:              Number(`${Moment(year?.toDate()).format('YYYY')}`),
+                Account_Status_ID:  2,
+            });
+        }
+
+        const apiUrl = ip_address() + "/account";                      //ส่งขอการแก้ไข
+        const requestOptions = {     
+            method: "POST",      
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                "Content-Type": "application/json",
+            },     
+            body: JSON.stringify(dataArr),
+        };
+
+        await fetch(apiUrl, requestOptions)
+        .then((response) => response.json())
+        .then(async (res) => {      
+            if (res.data) {
+                setSuccess(true);
+                handleDialogCreateClickClose();
+                getUnsoldAccount();
+                setYear(dayjs());
+                setImportAccount([]);
+            } else {
+                setError(true);  
+                setErrorMsg(" - "+res.error);  
+            }
+        });
+        setDialogLoadOpen(false);
+    }
+
     React.useEffect(() => {
         const fetchData = async () => {
             setDialogLoadOpen(true);
@@ -216,6 +273,10 @@ export default function Order_Account_UI() {
             <Grid container sx={{ padding: 2 }}>
                 <Grid sx={{ padding: 2 }}>
                         <Button variant="contained" color="secondary" onClick={() => handleDialogOrderClickOpen()}>Order Account</Button>
+                </Grid>
+
+                <Grid sx={{ padding: 2 }}>
+                    <Button variant="contained" color="primary" onClick={() => handleDialogCreateClickOpen()}>Import Account</Button>
                 </Grid>
             </Grid>
 

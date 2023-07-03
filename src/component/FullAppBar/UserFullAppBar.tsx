@@ -41,12 +41,6 @@ function UserFullAppBar() {
   function drawerList() {
     return (
       <List sx={{ width: "100%" }}>
-
-        <ListItem button component={RouterLink} to="/AllMyAccount">
-          <ViewListIcon />
-          <ListItemText primary="All My Account" sx={{ paddingLeft: 1 }} />
-        </ListItem>
-
         <ListItem button component={RouterLink} to="/UnsoldAccount">
           <MoneyOffIcon />
           <ListItemText primary="Unsold Account" sx={{ paddingLeft: 1 }} />
@@ -55,6 +49,16 @@ function UserFullAppBar() {
         <ListItem button component={RouterLink} to="/MyOrder">
           <GradingIcon />
           <ListItemText primary="My Order" sx={{ paddingLeft: 1 }} />
+        </ListItem>
+
+        <ListItem button component={RouterLink} to="/AllMyAccount">
+          <ViewListIcon />
+          <ListItemText primary="All My Account" sx={{ paddingLeft: 1 }} />
+        </ListItem>
+
+        <ListItem button component={RouterLink} to="/AllMyAccount">
+          <ViewListIcon />
+          <ListItemText primary="Revenue Accounts" sx={{ paddingLeft: 1 }} />
         </ListItem>
 
       </List>

@@ -28,7 +28,7 @@ export default function App() {
   }
 
   function routeList() {
-    if(localStorage.getItem("Position") == "Admin"){
+    if(localStorage.getItem("Position") == "dvasVIvgbvwuvBYeVFQHGACCQcyascqtyvchjq"){
       return( // Admin Routes
         <Routes>
           <Route path="/" element={<Home_Admin_UI/>} /> {/** home */}
@@ -38,7 +38,7 @@ export default function App() {
           <Route path="/All-Order" element={<All_Order_UI/>} /> {/** All Order Account */}
         </Routes>
       );
-    }else{ // User Routes
+    }else if(localStorage.getItem("Position") == "jJAviabisdvsBSDbwbvjBEBwnfndbERnERBAELVBUbev"){ // User Routes
       return(
         <Routes>
           <Route path="/" element={<Home_User_UI/>} /> {/** home */}
