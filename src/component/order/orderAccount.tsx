@@ -1,13 +1,16 @@
 import * as React from 'react';
 import { DataGridPro, FilterColumnsArgs, GetColumnForNewFilterArgs, GridColDef, GridRowSelectionModel, GridToolbarContainer, GridToolbarExport, GridToolbarColumnsButton, GridToolbarFilterButton, GridToolbarDensitySelector } from '@mui/x-data-grid-pro';
-import { Alert, Button, Dialog, DialogActions, DialogTitle, Grid, Snackbar } from '@mui/material';
+import { Alert, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Paper, Snackbar, TextField } from '@mui/material';
 import Moment from 'moment';
 import dayjs, { Dayjs } from 'dayjs';
+import * as XLSX from 'xlsx';
 
 import ip_address from '../ip';
 import { AccountsInterface } from '../../models/account/IAccount';
 import UserFullAppBar from '../FullAppBar/UserFullAppBar';
 import { AccountsImportInterface } from '../../models/account/IAccount_Import';
+import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
 export default function Order_Account_UI() {
     const [account, setAccount] = React.useState<AccountsInterface[]>([]);
@@ -23,6 +26,8 @@ export default function Order_Account_UI() {
     const [year, setYear] = React.useState<Dayjs | null>(dayjs());
 
     const [rowSelectionModel, setRowSelectionModel] = React.useState<GridRowSelectionModel>([]);
+
+    const [expenses, setExpenses] = React.useState<Number | null>(null);
     
     const handleDialogCreateClickOpen = () => {
         setDialogCreateOpen(true);
@@ -30,6 +35,23 @@ export default function Order_Account_UI() {
 
     const handleDialogCreateClickClose = () => {
         setDialogCreateOpen(false);
+    };
+
+    const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) {
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const data = new Uint8Array(event.target?.result as ArrayBuffer);
+            const workbook = XLSX.read(data, { type: 'array' });
+            const sheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[sheetName];
+            const json = XLSX.utils.sheet_to_json<AccountsImportInterface[]>(worksheet, { header: 1 });
+            setImportAccount(json);
+        };
+        reader.readAsArrayBuffer(file);
     };
 
     Moment.locale('th');
@@ -161,33 +183,20 @@ export default function Order_Account_UI() {
         setDialogLoadOpen(false);
     }
 
-    const CreateAccount = async () => {    
+    const CreateRevenue = async () => {    
 
-        setDialogLoadOpen(true);
+        let data = {                                                            //ประกาศก้อนข้อมูล
+            Income: expenses,      
+        };
 
-        var dataArr = [];
-
-        for (var i = 1; i < importAccount.length; i++) {
-            dataArr.push({
-                Email_User:         localStorage.getItem('email'),
-                Twitter_Account:    importAccount[i][0],
-                Twitter_Password:   importAccount[i][1],
-                Email_Accont:       importAccount[i][2],
-                Email_Password:     importAccount[i][3],
-                Phone_Number:       importAccount[i][4],
-                Years:              Number(`${Moment(year?.toDate()).format('YYYY')}`),
-                Account_Status_ID:  2,
-            });
-        }
-
-        const apiUrl = ip_address() + "/account";                      //ส่งขอการแก้ไข
+        const apiUrl = ip_address() + "/revenue/" + localStorage.getItem('email');                      //ส่งขอการแก้ไข
         const requestOptions = {     
             method: "POST",      
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("token")}`,
                 "Content-Type": "application/json",
             },     
-            body: JSON.stringify(dataArr),
+            body: JSON.stringify(data),
         };
 
         await fetch(apiUrl, requestOptions)
@@ -195,16 +204,67 @@ export default function Order_Account_UI() {
         .then(async (res) => {      
             if (res.data) {
                 setSuccess(true);
-                handleDialogCreateClickClose();
-                getUnsoldAccount();
-                setYear(dayjs());
-                setImportAccount([]);
+                setExpenses(null);
             } else {
                 setError(true);  
                 setErrorMsg(" - "+res.error);  
             }
         });
-        setDialogLoadOpen(false);
+    }
+
+    const CreateAccount = async () => {   
+
+        console.log(expenses)
+        
+        if(importAccount.length == 0){
+            setError(true);  
+            setErrorMsg(" - No file to import"); 
+        } else {
+
+            setDialogLoadOpen(true);
+
+            var dataArr = [];
+
+            for (var i = 1; i < importAccount.length; i++) {
+                dataArr.push({
+                    Email_User:         localStorage.getItem('email'),
+                    Twitter_Account:    importAccount[i][0],
+                    Twitter_Password:   importAccount[i][1],
+                    Email_Accont:       importAccount[i][2],
+                    Email_Password:     importAccount[i][3],
+                    Phone_Number:       importAccount[i][4],
+                    Years:              Number(`${Moment(year?.toDate()).format('YYYY')}`),
+                    Account_Status_ID:  2,
+                });
+            }
+
+            const apiUrl = ip_address() + "/account";                      //ส่งขอการแก้ไข
+            const requestOptions = {     
+                method: "POST",      
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    "Content-Type": "application/json",
+                },     
+                body: JSON.stringify(dataArr),
+            };
+
+            await fetch(apiUrl, requestOptions)
+            .then((response) => response.json())
+            .then(async (res) => {      
+                if (res.data) {
+                    setSuccess(true);
+                    handleDialogCreateClickClose();
+                    getUnsoldAccount();
+                    setYear(dayjs());
+                    setImportAccount([]);
+                } else {
+                    setError(true);  
+                    setErrorMsg(" - "+res.error);  
+                }
+            });
+            await CreateRevenue();
+            setDialogLoadOpen(false);
+        }
     }
 
     React.useEffect(() => {
@@ -304,6 +364,57 @@ export default function Order_Account_UI() {
                     {"Loading..."}
                 </DialogTitle>
         </Dialog>
+
+        <Dialog
+                open={dialogCreateOpen}
+                onClose={handleDialogCreateClickClose}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">
+                    {"Import Account(.xlsx file)"}
+                </DialogTitle>
+
+                <DialogContent>
+                    <Box>
+                        <Paper elevation={2} sx={{ padding: 2, margin: 2 }}>
+                            <Grid container>
+                                <Grid container>
+                                    <Grid margin={1} item xs={5}>
+                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                            <DatePicker
+                                                label={'Year'}
+                                                openTo="year"
+                                                views={['year']}
+                                                defaultValue={year}
+                                                onChange={(newValue) => {
+                                                    setYear(newValue);
+                                                } } />
+                                        </LocalizationProvider>
+                                    </Grid>
+                                    <Grid margin={1} item xs={5}>
+                                        <TextField
+                                            fullWidth
+                                            id="expenses"
+                                            label="Expenses"
+                                            type='number'
+                                            variant="outlined"
+                                            onChange={(event) => setExpenses((Number(event.target.value))*(-1))}
+                                        />
+                                    </Grid>
+                                    <Grid margin={1} item xs={12}>
+                                        <input type="file" onChange={handleFileUpload} />
+                                    </Grid>
+                                </Grid>
+                            </Grid>
+                        </Paper>
+                    </Box>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleDialogCreateClickClose}>Cancel</Button>
+                    <Button onClick={CreateAccount} color="error" autoFocus>Import</Button>
+                </DialogActions>
+            </Dialog>
 
         </Grid>
         </Grid></>
