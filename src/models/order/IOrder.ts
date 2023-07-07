@@ -5,4 +5,5 @@ export interface OrdersInterface {
     CreatedAt:  Date,
     User_ID:    number,
     User:       UsersInterface,
+    Slip:       string,
 }

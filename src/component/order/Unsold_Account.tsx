@@ -24,10 +24,13 @@ export default function Order_Account_UI() {
     const [dialogCreateOpen, setDialogCreateOpen] = React.useState(false);
 
     const [year, setYear] = React.useState<Dayjs | null>(dayjs());
+    const [imageString, setImageString] = React.useState<string | ArrayBuffer | null>(null);
 
     const [rowSelectionModel, setRowSelectionModel] = React.useState<GridRowSelectionModel>([]);
 
     const [expenses, setExpenses] = React.useState<Number | null>(null);
+
+    Moment.locale('th');
     
     const handleDialogCreateClickOpen = () => {
         setDialogCreateOpen(true);
@@ -54,7 +57,16 @@ export default function Order_Account_UI() {
         reader.readAsArrayBuffer(file);
     };
 
-    Moment.locale('th');
+    const handleImageChange = (event: any) => {
+        const image = event.target.files[0];
+    
+        const reader = new FileReader();
+        reader.readAsDataURL(image);
+        reader.onload = () => {
+            const base64Data = reader.result;
+            setImageString(base64Data)
+        }
+      }
 
     function CustomToolbar() {
         return (
@@ -75,7 +87,25 @@ export default function Order_Account_UI() {
     const columns: GridColDef[] = [
         { field: 'ID_Account', headerName: 'ID', width: 70},
         { field: 'Years', headerName: 'Years', width: 90, },
-        { field: 'Twitter_Account', headerName: 'Twitter Account', width: 200 },
+        { 
+            field: 'Twitter_Account',
+            headerName: 'Twitter Account',
+            width: 200,
+            renderCell: (params) => (
+              <a href={`https://twitter.com/${params.value}`} target="_blank" rel="noopener noreferrer">
+                {params.value}
+              </a>
+            ),
+        },
+        { field: ' ', headerName: 'Shadowbanned check', width: 200, renderCell: params => (
+            <Button
+                variant="contained"
+                color="primary"
+                onClick={() => handleShadowbannedButtonClick(params.row.Twitter_Account)}
+            >
+                Check
+            </Button>
+        ),},
         { field: 'Twitter_Password', headerName: 'Twitter password', width: 200 },
         { field: 'Email', headerName: 'Email', width: 200 },
         { field: 'Email_Password', headerName: 'Email password', width: 200 },
@@ -126,6 +156,10 @@ export default function Order_Account_UI() {
     const handleDialogOrderClickClose = () => {
         setDialogOrderOpen(false);
     }
+
+    const handleShadowbannedButtonClick = (account: string) => {
+        window.open("https://hisubway.online/shadowban/?username=" + account , "_blank");
+    }
       
     const getUnsoldAccount = async () => {
         const apiUrl = ip_address() + "/unsold-account/"+localStorage.getItem('email'); // email คือ email ที่ผ่านเข้ามาทาง parameter
@@ -148,39 +182,53 @@ export default function Order_Account_UI() {
 
     const CreateOrder = async () => {    
 
-        setDialogLoadOpen(true);
+        if(rowSelectionModel.length == 0){
+            setError(true);  
+            setErrorMsg(" - No account selected"); 
+        } else {
 
-        var dataArr = [];
+            setDialogLoadOpen(true);
 
-        for (var i = 0; i < rowSelectionModel.length; i++) {
-            dataArr.push({
-                Account_ID:         rowSelectionModel[i],
-            });
-        }
+            let dataSlip = {                                                            //ประกาศก้อนข้อมูล
+                Slip: imageString,      
+            };
 
-        const apiUrl = ip_address() + "/order/" + localStorage.getItem('email');                      //ส่งขอการแก้ไข
-        const requestOptions = {     
-            method: "POST",      
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-                "Content-Type": "application/json",
-            },     
-            body: JSON.stringify(dataArr),
-        };
+            var dataArr = [];
 
-        await fetch(apiUrl, requestOptions)
-        .then((response) => response.json())
-        .then(async (res) => {      
-            if (res.data) {
-                setSuccess(true);
-                handleDialogOrderClickClose();
-                getUnsoldAccount();
-            } else {
-                setError(true);  
-                setErrorMsg(" - "+res.error);  
+            for (var i = 0; i < rowSelectionModel.length; i++) {
+                dataArr.push({
+                    Account_ID:         rowSelectionModel[i],
+                });
             }
-        });
-        setDialogLoadOpen(false);
+
+            const apiUrl = ip_address() + "/order/" + localStorage.getItem('email');                      //ส่งขอการแก้ไข
+            const requestOptions = {     
+                method: "POST",      
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    "Content-Type": "application/json",
+                },     
+                body: JSON.stringify({
+                    accountToOrder: dataArr,
+                    dataSlip: dataSlip
+                  }),
+            };
+
+            await fetch(apiUrl, requestOptions)
+            .then((response) => response.json())
+            .then(async (res) => {      
+                if (res.data) {
+                    setSuccess(true);
+                    handleDialogOrderClickClose();
+                    getUnsoldAccount();
+                } else {
+                    setError(true);  
+                    setErrorMsg(" - "+res.error);  
+                }
+            });
+            await CreateRevenue();
+            setDialogLoadOpen(false);
+        }
     }
 
     const CreateRevenue = async () => {    
@@ -204,17 +252,15 @@ export default function Order_Account_UI() {
         .then(async (res) => {      
             if (res.data) {
                 setSuccess(true);
-                setExpenses(null);
             } else {
                 setError(true);  
                 setErrorMsg(" - "+res.error);  
             }
         });
+        setExpenses(null);
     }
 
     const CreateAccount = async () => {   
-
-        console.log(expenses)
         
         if(importAccount.length == 0){
             setError(true);  
@@ -322,10 +368,6 @@ export default function Order_Account_UI() {
                             }}
                             rowSelectionModel={rowSelectionModel}
                             disableRowSelectionOnClick
-                            onCellDoubleClick={async (params, event) => {
-                                await navigator.clipboard.writeText(String(params.formattedValue));
-                                window.open("https://hisubway.online/shadowban/?username=" + params.formattedValue , "_blank");
-                              }}
                         />
                 </div>
             </Grid>
@@ -349,6 +391,23 @@ export default function Order_Account_UI() {
                 <DialogTitle id="alert-dialog-title">
                     {"Order " + rowSelectionModel.length + " Account"}
                 </DialogTitle>
+                    <Grid margin={1} item xs={5}>
+                        <TextField
+                            fullWidth
+                            id="income"
+                            label="Income"
+                            type='number'
+                            variant="outlined"
+                            onChange={(event) => setExpenses(Number(event.target.value))}
+                        />
+                        <Grid item xs={12}> {/* Profile Picture */}
+                            <h4>Slip</h4>
+                            <Grid>
+                                <img src={`${imageString}`} width="360" height="640"/> {/** show base64 picture from string variable (that contain base64 picture data) */}
+                            </Grid>
+                            <input type="file" onChange={handleImageChange} />
+                        </Grid>
+                    </Grid>
             <DialogActions>
                 <Button onClick={handleDialogOrderClickClose} color="inherit">Cancel</Button>
                 <Button onClick={CreateOrder} color="success" autoFocus>Order</Button>

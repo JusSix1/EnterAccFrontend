@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import './App.css';
 import SignIn_User from "./component/SignIn_User_UI";
 import User_Profile_UI from "./component/user/User_Profile_UI";
-import Order_Account_UI from "./component/order/orderAccount";
+import Order_Account_UI from "./component/order/Unsold_Account";
 import My_Order_UI from "./component/order/myOrder";
 import All_Admin_UI from "./component/admin/All_Admin_UI";
 import Home_User_UI from "./component/Home_User_UI";
@@ -12,6 +12,7 @@ import All_My_Account_UI from "./component/account/All_My_Account_UI";
 import All_Account_UI from "./component/account/All_Account_UI";
 import All_User_UI from "./component/user/All_User_UI";
 import All_Order_UI from "./component/order/All_Order_UI";
+import My_Revenue_Account_UI from "./component/RevenueAccount/myRevenueAccount";
 
 export default function App() {
   const [token, setToken] = React.useState<String>("");
@@ -46,6 +47,7 @@ export default function App() {
           <Route path="/AllMyAccount" element={<All_My_Account_UI/>} /> {/** All Account */}
           <Route path="/UnsoldAccount" element={<Order_Account_UI/>} /> {/** Unsold Account */}
           <Route path="/MyOrder" element={<My_Order_UI/>} /> {/** My Order */}
+          <Route path="/MyRevenueAccount" element={<My_Revenue_Account_UI/>} /> {/** My Revenue */}
         </Routes>
       );
     }

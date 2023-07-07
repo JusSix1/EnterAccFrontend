@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { DataGridPro, FilterColumnsArgs, GetColumnForNewFilterArgs, GridColDef, GridRowSelectionModel, GridToolbarContainer, GridToolbarExport, GridToolbarColumnsButton, GridToolbarFilterButton, GridToolbarDensitySelector, GridEventListener, GridCellParams, MuiEvent } from '@mui/x-data-grid-pro';
-import { Alert, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Paper, Snackbar } from '@mui/material';
+import { Alert, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Paper, Snackbar, TextField } from '@mui/material';
 import * as XLSX from 'xlsx';
 import Moment from 'moment';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
@@ -24,6 +24,7 @@ export default function All_My_Account_UI() {
     const [dialogDeleteOpen, setDialogDeleteOpen] = React.useState(false);
 
     const [year, setYear] = React.useState<Dayjs | null>(dayjs());
+    const [expenses, setExpenses] = React.useState<Number | null>(null);
 
     const [rowSelectionModel, setRowSelectionModel] = React.useState<GridRowSelectionModel>([]);
 
@@ -48,9 +49,25 @@ export default function All_My_Account_UI() {
     const columns: GridColDef[] = [
         { field: 'ID_Account', headerName: 'ID', width: 70},
         { field: 'Years', headerName: 'Years', width: 90, },
-        { field: 'Account_Status', headerName: 'Status', width: 100, valueGetter: (params) => params.value.Status, },
-        { field: 'Order_ID', headerName: 'Order', width: 90 },
-        { field: 'Twitter_Account', headerName: 'Twitter Account', width: 200 },
+        { 
+            field: 'Twitter_Account',
+            headerName: 'Twitter Account',
+            width: 200,
+            renderCell: (params) => (
+              <a href={`https://twitter.com/${params.value}`} target="_blank" rel="noopener noreferrer">
+                {params.value}
+              </a>
+            ),
+        },
+        { field: ' ', headerName: 'Shadowbanned check', width: 200, renderCell: params => (
+            <Button
+                variant="contained"
+                color="primary"
+                onClick={() => handleShadowbannedButtonClick(params.row.Twitter_Account)}
+            >
+                Check
+            </Button>
+        ),},
         { field: 'Twitter_Password', headerName: 'Twitter password', width: 200 },
         { field: 'Email', headerName: 'Email', width: 200 },
         { field: 'Email_Password', headerName: 'Email password', width: 200 },
@@ -110,6 +127,10 @@ export default function All_My_Account_UI() {
         setDialogDeleteOpen(false);
     };
 
+    const handleShadowbannedButtonClick = (account: string) => {
+        window.open("https://hisubway.online/shadowban/?username=" + account , "_blank");
+    }
+
     const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (!file) {
@@ -146,33 +167,73 @@ export default function All_My_Account_UI() {
             });
     };
 
-    const CreateAccount = async () => {    
+    const CreateAccount = async () => {   
+        
+        if(importAccount.length == 0){
+            setError(true);  
+            setErrorMsg(" - No file to import"); 
+        } else {
 
-        setDialogLoadOpen(true);
+            setDialogLoadOpen(true);
 
-        var dataArr = [];
+            var dataArr = [];
 
-        for (var i = 1; i < importAccount.length; i++) {
-            dataArr.push({
-                Email_User:         localStorage.getItem('email'),
-                Twitter_Account:    importAccount[i][0],
-                Twitter_Password:   importAccount[i][1],
-                Email_Accont:       importAccount[i][2],
-                Email_Password:     importAccount[i][3],
-                Phone_Number:       importAccount[i][4],
-                Years:              Number(`${Moment(year?.toDate()).format('YYYY')}`),
-                Account_Status_ID:  2,
+            for (var i = 1; i < importAccount.length; i++) {
+                dataArr.push({
+                    Email_User:         localStorage.getItem('email'),
+                    Twitter_Account:    importAccount[i][0],
+                    Twitter_Password:   importAccount[i][1],
+                    Email_Accont:       importAccount[i][2],
+                    Email_Password:     importAccount[i][3],
+                    Phone_Number:       importAccount[i][4],
+                    Years:              Number(`${Moment(year?.toDate()).format('YYYY')}`),
+                    Account_Status_ID:  2,
+                });
+            }
+
+            const apiUrl = ip_address() + "/account";                      //ส่งขอการแก้ไข
+            const requestOptions = {     
+                method: "POST",      
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    "Content-Type": "application/json",
+                },     
+                body: JSON.stringify(dataArr),
+            };
+
+            await fetch(apiUrl, requestOptions)
+            .then((response) => response.json())
+            .then(async (res) => {      
+                if (res.data) {
+                    setSuccess(true);
+                    handleDialogCreateClickClose();
+                    getAccount();
+                    setYear(dayjs());
+                    setImportAccount([]);
+                } else {
+                    setError(true);  
+                    setErrorMsg(" - "+res.error);  
+                }
             });
+            await CreateRevenue();
+            setDialogLoadOpen(false);
         }
+    }
 
-        const apiUrl = ip_address() + "/account";                      //ส่งขอการแก้ไข
+    const CreateRevenue = async () => {    
+
+        let data = {                                                            //ประกาศก้อนข้อมูล
+            Income: expenses,      
+        };
+
+        const apiUrl = ip_address() + "/revenue/" + localStorage.getItem('email');                      //ส่งขอการแก้ไข
         const requestOptions = {     
             method: "POST",      
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("token")}`,
                 "Content-Type": "application/json",
             },     
-            body: JSON.stringify(dataArr),
+            body: JSON.stringify(data),
         };
 
         await fetch(apiUrl, requestOptions)
@@ -180,16 +241,12 @@ export default function All_My_Account_UI() {
         .then(async (res) => {      
             if (res.data) {
                 setSuccess(true);
-                handleDialogCreateClickClose();
-                getAccount();
-                setYear(dayjs());
-                setImportAccount([]);
             } else {
                 setError(true);  
                 setErrorMsg(" - "+res.error);  
             }
         });
-        setDialogLoadOpen(false);
+        setExpenses(null);
     }
 
     const DeleteAccount = async () => {    
@@ -319,18 +376,28 @@ export default function All_My_Account_UI() {
                         <Paper elevation={2} sx={{ padding: 2, margin: 2 }}>
                             <Grid container>
                                 <Grid container>
-                                    <Grid margin={1} item xs={12}>
-                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                            <DatePicker
-                                                label={'year'}
-                                                openTo="year"
-                                                views={['year']}
-                                                defaultValue={year}
-                                                onChange={(newValue) => {
-                                                    setYear(newValue);
-                                                } } />
-                                        </LocalizationProvider>
-                                    </Grid>
+                                    <Grid margin={1} item xs={5}>
+                                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                                <DatePicker
+                                                    label={'Year'}
+                                                    openTo="year"
+                                                    views={['year']}
+                                                    defaultValue={year}
+                                                    onChange={(newValue) => {
+                                                        setYear(newValue);
+                                                    } } />
+                                            </LocalizationProvider>
+                                        </Grid>
+                                        <Grid margin={1} item xs={5}>
+                                            <TextField
+                                                fullWidth
+                                                id="expenses"
+                                                label="Expenses"
+                                                type='number'
+                                                variant="outlined"
+                                                onChange={(event) => setExpenses((Number(event.target.value))*(-1))}
+                                            />
+                                        </Grid>
                                     <Grid margin={1} item xs={12}>
                                         <input type="file" onChange={handleFileUpload} />
                                     </Grid>

@@ -22,6 +22,7 @@ import { SigninUserInterface } from "../models/ISignIn_User";
 import { GendersInterface } from "../models/user/IGender";
 import ip_address from "./ip";
 import { SigninAdminInterface } from "../models/ISignIn_Admin";
+import { reverse } from "dns";
 
 const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
   props,
@@ -385,16 +386,16 @@ function SignIn_User() {
               >
                 Sign In
               </Button>
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                sx={{ mt: 1, mb: 2 }}
-                onClick={handleDialogRegisterClickOpen}
-              >
-                Register
-              </Button>
-            </Box>  
+              <Grid container item direction={"row-reverse"}>
+                <Typography
+                    variant="button"
+                    onClick={handleDialogRegisterClickOpen}
+                    sx={{ cursor: 'pointer' }}
+                >
+                  Register
+                </Typography>
+              </Grid>
+              </Box>  
           </Box>
           <Box sx={{ mt: 1}}
             m={1}

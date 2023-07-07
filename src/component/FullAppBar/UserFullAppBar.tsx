@@ -56,9 +56,9 @@ function UserFullAppBar() {
           <ListItemText primary="All My Account" sx={{ paddingLeft: 1 }} />
         </ListItem>
 
-        <ListItem button component={RouterLink} to="/AllMyAccount">
+        <ListItem button component={RouterLink} to="/MyRevenueAccount">
           <ViewListIcon />
-          <ListItemText primary="Revenue Accounts" sx={{ paddingLeft: 1 }} />
+          <ListItemText primary="Revenue Account" sx={{ paddingLeft: 1 }} />
         </ListItem>
 
       </List>
@@ -66,7 +66,6 @@ function UserFullAppBar() {
   }
 
   function myProfileUser() {
-    if (localStorage.getItem("position") == "User")
       return (
         <MenuItem onClick={handleClose} component={RouterLink} to={"/profile/" + localStorage.getItem("email")} >My Profile</MenuItem>
       )

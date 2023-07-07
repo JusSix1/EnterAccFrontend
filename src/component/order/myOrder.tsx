@@ -18,6 +18,11 @@ export default function My_Order_UI() {
     const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
     const [dialogWatchOpen, setDialogWatchOpen] = React.useState(false);
     const [dialogLoadOpen, setDialogLoadOpen] = React.useState(false);
+    const [dialogSlipOpen, setDialogSlipOpen] = React.useState(false);
+    const [dialogChangeSlipOpen, setDialogChangeSlipOpen] = React.useState(false);
+
+    const [orderID, setOrderID] = React.useState<Number | null>(null);
+    const [imageString, setImageString] = React.useState<string | ArrayBuffer | null>(null);
 
     const [rowSelectionModel, setRowSelectionModel] = React.useState<GridRowSelectionModel>([]);
 
@@ -36,14 +41,49 @@ export default function My_Order_UI() {
     const columnsForOrder: GridColDef[] = [
         { field: 'ID', headerName: 'ID', width: 70},
         { field: 'CreatedAt', headerName: 'Created At', width: 300, valueFormatter: params => 
-        moment(params?.value).format("DD/MM/YYYY hh:mm A"),}
+        moment(params?.value).format("DD/MM/YYYY hh:mm A"),},
+        { field: 'Slip', headerName: 'Slip', width: 200, renderCell: params => (
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => handleSlipButtonClick(params.row.Slip)}
+            >
+              View Slip
+            </Button>
+          ),},
+          { field: ' ', width: 200, renderCell: params => (
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => handleChangeSlipButtonClick(params.row.ID)}
+            >
+              Change Slip
+            </Button>
+          ),}
     ];   
 
     const columnsForAccount: GridColDef[] = [
         { field: 'ID_Account', headerName: 'ID', width: 70},
         { field: 'Years', headerName: 'Years', width: 90, },
-        { field: 'Order_ID', headerName: 'Order ID', width: 90 },
-        { field: 'Twitter_Account', headerName: 'Twitter Account', width: 200 },
+        { 
+            field: 'Twitter_Account',
+            headerName: 'Twitter Account',
+            width: 200,
+            renderCell: (params) => (
+              <a href={`https://twitter.com/${params.value}`} target="_blank" rel="noopener noreferrer">
+                {params.value}
+              </a>
+            ),
+        },
+        { field: ' ', headerName: 'Shadowbanned check', width: 200, renderCell: params => (
+            <Button
+                variant="contained"
+                color="primary"
+                onClick={() => handleShadowbannedButtonClick(params.row.Twitter_Account)}
+            >
+                Check
+            </Button>
+        ),},
         { field: 'Twitter_Password', headerName: 'Twitter password', width: 200 },
         { field: 'Email', headerName: 'Email', width: 200 },
         { field: 'Email_Password', headerName: 'Email password', width: 200 },
@@ -75,6 +115,17 @@ export default function My_Order_UI() {
             return columnForNewFilter?.field ?? null;
     };
 
+    const handleImageChange = (event: any) => {
+        const image = event.target.files[0];
+    
+        const reader = new FileReader();
+        reader.readAsDataURL(image);
+        reader.onload = () => {
+            const base64Data = reader.result;
+            setImageString(base64Data)
+        }
+      }
+
     const handleClose = (
         event?: React.SyntheticEvent | Event,
         reason?: string
@@ -94,6 +145,29 @@ export default function My_Order_UI() {
     const handleDialogWatchClickClose = () => {
         setDialogWatchOpen(false);
     };
+
+    const handleSlipButtonClick = (slipBase64: string) => {
+        setImageString(slipBase64);
+        setDialogSlipOpen(true);
+      };
+
+    const handleCloseSlipDialog = () => {
+        setDialogSlipOpen(false);
+        setImageString(null);
+    };
+
+    const handleChangeSlipButtonClick = (ID: Number) => {
+        setOrderID(ID);
+        setDialogChangeSlipOpen(true);
+    };
+
+    const handleCloseChangeSlipDialog = () => {
+        setDialogChangeSlipOpen(false);
+    };
+
+    const handleShadowbannedButtonClick = (account: string) => {
+        window.open("https://hisubway.online/shadowban/?username=" + account , "_blank");
+    }
 
     const ExportAsTextFile = async () => {
         setDialogLoadOpen(true);
@@ -170,6 +244,35 @@ export default function My_Order_UI() {
             });
     };
 
+    const PatchOrder = () => {    
+        let data = {
+            ID:     orderID,
+            Slip:   imageString,
+        };
+        const apiUrl = ip_address() + "/order";                      //ส่งขอการแก้ไข
+        const requestOptions = {     
+            method: "PATCH",      
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                "Content-Type": "application/json",
+            },     
+            body: JSON.stringify(data),
+        };
+
+        fetch(apiUrl, requestOptions)
+        .then((response) => response.json())
+        .then(async (res) => {      
+            if (res.data) {
+                setSuccess(true);
+                getMyOrder();
+                handleCloseChangeSlipDialog();
+            } else {
+                setError(true);  
+                setErrorMsg(" - "+res.error);  
+            }
+        });
+    }
+
     React.useEffect(() => {
         const fetchData = async () => {
             setDialogLoadOpen(true);
@@ -180,7 +283,8 @@ export default function My_Order_UI() {
     }, []);
 
     return (
-        <><UserFullAppBar /><Grid>
+        <><UserFullAppBar />
+        <Grid>
         <Grid>
             <Snackbar                                                                                 //ป้ายบันทึกสำเร็จ
                 open={success}
@@ -289,6 +393,40 @@ export default function My_Order_UI() {
                         {"Loading..."}
                     </DialogTitle>
             </Dialog>
+
+            <Dialog open={dialogSlipOpen} onClose={handleCloseSlipDialog}>
+                <DialogTitle>Slip Image</DialogTitle>
+                <DialogContent>
+                    <img src={`${imageString}`} alt="Slip" width="100%" height="auto" />
+                </DialogContent>
+                <DialogActions>
+                <Button onClick={handleCloseSlipDialog} color="primary">
+                    Close
+                </Button>
+                </DialogActions>
+            </Dialog>
+
+            <Dialog
+                open={dialogChangeSlipOpen}
+                onClose={handleChangeSlipButtonClick}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">
+                    {"Order " + rowSelectionModel.length + " Account"}
+                </DialogTitle>
+                <Grid margin={1} item xs={12}> {/* Profile Picture */}
+                    <h4>Slip</h4>
+                    <Grid>
+                        <img src={`${imageString}`} width="480" height="640"/> {/** show base64 picture from string variable (that contain base64 picture data) */}
+                    </Grid>
+                    <input type="file" onChange={handleImageChange} />
+                </Grid>
+                <DialogActions>
+                    <Button onClick={handleCloseChangeSlipDialog} color="inherit">Cancel</Button>
+                    <Button onClick={PatchOrder} color="success" autoFocus>Save</Button>
+                </DialogActions>
+            </Dialog> 
 
         </Grid>
     </Grid></>
