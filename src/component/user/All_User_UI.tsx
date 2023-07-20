@@ -1,4 +1,4 @@
-import { Alert, Dialog, DialogTitle, Grid, Snackbar } from '@mui/material';
+import { Alert, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Paper, Snackbar, TextField } from '@mui/material';
 import { DataGridPro, FilterColumnsArgs, GetColumnForNewFilterArgs, GridColDef, GridRowSelectionModel, GridToolbarColumnsButton, GridToolbarContainer, GridToolbarDensitySelector, GridToolbarExport, GridToolbarFilterButton } from '@mui/x-data-grid-pro';
 import React from 'react';
 import AdminFullAppBar from '../FullAppBar/AdminFullAppBar';
@@ -13,11 +13,16 @@ export default function All_User_UI() {
 
     const [date, setDate] = React.useState<Dayjs | null>(dayjs());
 
+    const [new_password, setNew_password] = React.useState<string | null>(null);
+    const [confirm_password, setConfirm_password] = React.useState<string | null>(null);
+    const [userID, setUserID] = React.useState<Number | null>(null);
+
     const [success, setSuccess] = React.useState(false);
     const [error, setError] = React.useState(false);
     const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
     const [rowSelectionModel, setRowSelectionModel] = React.useState<GridRowSelectionModel>([]);
 
+    const [dialogChangePasswordOpen, setDialogChangePasswordOpen] = React.useState(false);
     const [dialogLoadOpen, setDialogLoadOpen] = React.useState(false);
     Moment.locale('th');
 
@@ -42,12 +47,18 @@ export default function All_User_UI() {
         { field: 'Email', headerName: 'Email', width: 200},
         { field: 'FirstName', headerName: 'FirstName', width: 200},
         { field: 'LastName', headerName: 'LastName', width: 200},
-        { field: 'Password', headerName: 'Password', width: 200},
+        { field: ' ', headerName: 'Change Password', width: 200, renderCell: params => (
+            <Button
+                size='small'
+                variant="contained"
+                color="primary"
+                onClick={() => handleChangeButtonClick(params.row)}
+            >
+                Change
+            </Button>
+        ),},
         { field: 'Profile_Name', headerName: 'Profile_Name', width: 200},
-        { field: 'Profile_Picture', headerName: 'Profile_Picture', width: 200},
-        { field: 'Birthday', headerName: 'Birthday', width: 200},
         { field: 'Phone_number', headerName: 'Phone_number', width: 200},
-        { field: 'Gender_ID', headerName: 'Gender_ID', width: 200},
     ];  
 
     const handleClose = (
@@ -61,6 +72,15 @@ export default function All_User_UI() {
             setError(false);
             setErrorMsg("")
     };  
+
+    const handleChangeButtonClick = (revenue: any) =>{
+        setUserID(revenue.ID);
+        setDialogChangePasswordOpen(true);
+    }
+
+    const handleChangePasswordClickClose = () =>{
+        setDialogChangePasswordOpen(false);
+    }
 
     const getColumnForNewFilter = ({
         currentFilters,
@@ -105,6 +125,37 @@ export default function All_User_UI() {
                 }
             });
     };
+
+    const PatchPassword = () => {    
+        if(new_password == confirm_password){
+            let data = {
+                ID:              userID,         
+                NewPassword:        new_password,
+            };
+            const apiUrl = ip_address() + "/passwordFromAdmin";                      //ส่งขอการแก้ไข
+            const requestOptions = {     
+                method: "PATCH",      
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    "Content-Type": "application/json",
+                },     
+                body: JSON.stringify(data),
+            };
+
+            fetch(apiUrl, requestOptions)
+            .then((response) => response.json())
+            .then(async (res) => {      
+                if (res.data) {
+                    setSuccess(true);
+                    getAllUser();
+                    handleChangePasswordClickClose();
+                } else {
+                    setError(true);  
+                    setErrorMsg(" - "+res.error);  
+                }
+            });
+        }
+    }
 
     React.useEffect(() => {
         const fetchData = async () => {
@@ -167,6 +218,50 @@ export default function All_User_UI() {
                         
                 </div>
             </Grid>
+
+            <Dialog
+                open={dialogChangePasswordOpen}
+                onClose={handleChangePasswordClickClose}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">
+                    {"Import Account(.xlsx file)"}
+                </DialogTitle>
+
+                <DialogContent>
+                    <Box>
+                        <Paper elevation={2} sx={{ padding: 2, margin: 2 }}>
+                            <Grid container>
+                                <Grid margin={1}>
+                                    <TextField
+                                        fullWidth
+                                        id="new_password"
+                                        label="New password"
+                                        type='string'
+                                        variant="outlined"
+                                        onChange={(event) => setNew_password(event.target.value)}
+                                    />
+                                </Grid>
+                                <Grid margin={1}>
+                                    <TextField
+                                        fullWidth
+                                        id="confirm_password"
+                                        label="Confirm password"
+                                        type='string'
+                                        variant="outlined"
+                                        onChange={(event) => setConfirm_password(event.target.value)}
+                                    />
+                                </Grid>
+                            </Grid>
+                        </Paper>
+                    </Box>
+                </DialogContent>
+                <DialogActions>
+                    <Button size='small' onClick={PatchPassword} autoFocus>Update</Button>
+                    <Button size='small' onClick={handleChangePasswordClickClose} color="error" >Cancel</Button>
+                </DialogActions>
+            </Dialog>
         
             <Dialog
                 open={dialogLoadOpen}

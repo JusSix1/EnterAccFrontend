@@ -99,6 +99,7 @@ export default function Order_Account_UI() {
         },
         { field: ' ', headerName: 'Shadowbanned check', width: 200, renderCell: params => (
             <Button
+                size='small'
                 variant="contained"
                 color="primary"
                 onClick={() => handleShadowbannedButtonClick(params.row.Twitter_Account)}
@@ -374,11 +375,11 @@ export default function Order_Account_UI() {
 
             <Grid container sx={{ padding: 2 }}>
                 <Grid sx={{ padding: 2 }}>
-                        <Button variant="contained" color="secondary" onClick={() => handleDialogOrderClickOpen()}>Order Account</Button>
+                        <Button size='small' variant="contained" color="secondary" onClick={() => handleDialogOrderClickOpen()}>Order Account</Button>
                 </Grid>
 
                 <Grid sx={{ padding: 2 }}>
-                    <Button variant="contained" color="primary" onClick={() => handleDialogCreateClickOpen()}>Import Account</Button>
+                    <Button size='small' variant="contained" color="primary" onClick={() => handleDialogCreateClickOpen()}>Import Account</Button>
                 </Grid>
             </Grid>
 
@@ -409,8 +410,8 @@ export default function Order_Account_UI() {
                         </Grid>
                     </Grid>
             <DialogActions>
-                <Button onClick={handleDialogOrderClickClose} color="inherit">Cancel</Button>
-                <Button onClick={CreateOrder} color="success" autoFocus>Order</Button>
+                <Button size='small' onClick={handleDialogOrderClickClose} color="inherit">Cancel</Button>
+                <Button size='small' onClick={CreateOrder} color="success" autoFocus>Order</Button>
             </DialogActions>
         </Dialog>      
 
@@ -470,8 +471,8 @@ export default function Order_Account_UI() {
                     </Box>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleDialogCreateClickClose}>Cancel</Button>
-                    <Button onClick={CreateAccount} color="error" autoFocus>Import</Button>
+                    <Button size='small' onClick={handleDialogCreateClickClose}>Cancel</Button>
+                    <Button size='small' onClick={CreateAccount} color="error" autoFocus>Import</Button>
                 </DialogActions>
             </Dialog>
 

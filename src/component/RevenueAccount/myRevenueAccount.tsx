@@ -41,6 +41,7 @@ export default function My_Revenue_Account_UI() {
         { field: 'Income', headerName: 'Income/Expense', width: 300},
         { field: ' ', headerName: 'Edit', width: 200, renderCell: params => (
             <Button
+                size='small'
                 variant="contained"
                 color="primary"
                 onClick={() => handleEditButtonClick(params.row)}
@@ -248,8 +249,8 @@ export default function My_Revenue_Account_UI() {
                     </Box>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={PatchRevenue} autoFocus>Update</Button>
-                    <Button onClick={handleEditClickClose} color="error" >Cancel</Button>
+                    <Button size='small' onClick={PatchRevenue} autoFocus>Update</Button>
+                    <Button size='small' onClick={handleEditClickClose} color="error" >Cancel</Button>
                 </DialogActions>
             </Dialog>
         </>

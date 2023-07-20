@@ -35,8 +35,8 @@ export default function App() {
           <Route path="/" element={<Home_Admin_UI/>} /> {/** home */}
           <Route path="/All-Admin" element={<All_Admin_UI/>} /> {/** All Admin Account */}
           <Route path="/All-User" element={<All_User_UI/>} /> {/** All User Account */}
-          <Route path="/All-Account" element={<All_Account_UI/>} /> {/** All Account Account */}
-          <Route path="/All-Order" element={<All_Order_UI/>} /> {/** All Order Account */}
+          {/**<Route path="/All-Account" element={<All_Account_UI/>} /> {/** All Account Account */}
+          {/**<Route path="/All-Order" element={<All_Order_UI/>} /> {/** All Order Account */}
         </Routes>
       );
     }else if(localStorage.getItem("Position") == "jJAviabisdvsBSDbwbvjBEBwnfndbERnERBAELVBUbev"){ // User Routes

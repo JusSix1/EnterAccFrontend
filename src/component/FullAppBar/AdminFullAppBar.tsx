@@ -42,7 +42,7 @@ function AdminFullAppBar() {
           <ListItemText primary="All User" sx={{ paddingLeft: 1 }} />
         </ListItem>
 
-        <ListItem button component={RouterLink} to="/All-Account">
+        {/* <ListItem button component={RouterLink} to="/All-Account">
           <FormatListBulletedIcon />
           <ListItemText primary="All Account" sx={{ paddingLeft: 1 }} />
         </ListItem>
@@ -50,7 +50,7 @@ function AdminFullAppBar() {
         <ListItem button component={RouterLink} to="/All-Order">
           <BookmarkBorderIcon />
           <ListItemText primary="All Order" sx={{ paddingLeft: 1 }} />
-        </ListItem>
+        </ListItem> */}
 
       </List>
     );

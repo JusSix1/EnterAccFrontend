@@ -1,4 +1,3 @@
-import Home from '@mui/icons-material/Home';
 import { Alert, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Paper, Snackbar, TextField } from '@mui/material';
 import { DataGridPro, FilterColumnsArgs, GetColumnForNewFilterArgs, GridColDef, GridRowSelectionModel, GridToolbarColumnsButton, GridToolbarContainer, GridToolbarDensitySelector, GridToolbarExport, GridToolbarFilterButton } from '@mui/x-data-grid-pro';
 import React from 'react';
@@ -314,13 +313,13 @@ export default function All_Admin_UI() {
 
             <Grid container sx={{ padding: 2 }}>
                 <Grid sx={{ padding: 2 }}>
-                    <Button variant="contained" color="primary" onClick={() => handleDialogCreateClickOpen()}>Add Admin</Button>
+                    <Button size='small' variant="contained" color="primary" onClick={() => handleDialogCreateClickOpen()}>Add Admin</Button>
                 </Grid>
                 <Grid sx={{ padding: 2 }}>
-                    <Button variant="contained" color="secondary" onClick={() => handleDialogUpdateBigClickOpen()}>Update rights</Button>
+                    <Button size='small' variant="contained" color="secondary" onClick={() => handleDialogUpdateBigClickOpen()}>Update rights</Button>
                 </Grid>
                 <Grid sx={{ padding: 2 }}>
-                    <Button variant="contained" color="error" onClick={() => handleDialogDeleteClickOpen()}>Delete Admin</Button>
+                    <Button size='small' variant="contained" color="error" onClick={() => handleDialogDeleteClickOpen()}>Delete Admin</Button>
                 </Grid>
             </Grid>
 
@@ -378,8 +377,8 @@ export default function All_Admin_UI() {
                 </Box>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleDialogCreateClickClose} color="error">Cancel</Button>
-                    <Button onClick={submitCreate} autoFocus>Add</Button>
+                    <Button size='small' onClick={handleDialogCreateClickClose} color="error">Cancel</Button>
+                    <Button size='small' onClick={submitCreate} autoFocus>Add</Button>
                 </DialogActions>
             </Dialog>
 
@@ -393,8 +392,8 @@ export default function All_Admin_UI() {
                     {"Update rights Admin"}
                 </DialogTitle>
                 <DialogActions>
-                    <Button onClick={handleDialogUpdateBigClickClose}>Cancel</Button>
-                    <Button onClick={UpdateBigAdmin} color="error" autoFocus>Update</Button>
+                    <Button size='small' onClick={handleDialogUpdateBigClickClose}>Cancel</Button>
+                    <Button size='small' onClick={UpdateBigAdmin} color="error" autoFocus>Update</Button>
                 </DialogActions>
             </Dialog>
 
@@ -408,8 +407,8 @@ export default function All_Admin_UI() {
                     {"Delete Admin"}
                 </DialogTitle>
                 <DialogActions>
-                    <Button onClick={handleDialogDeleteClickClose}>Cancel</Button>
-                    <Button onClick={DeleteAdmin} color="error" autoFocus>Delete</Button>
+                    <Button size='small' onClick={handleDialogDeleteClickClose}>Cancel</Button>
+                    <Button size='small' onClick={DeleteAdmin} color="error" autoFocus>Delete</Button>
                 </DialogActions>
             </Dialog>
         

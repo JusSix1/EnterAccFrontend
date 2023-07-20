@@ -44,18 +44,20 @@ export default function My_Order_UI() {
         moment(params?.value).format("DD/MM/YYYY hh:mm A"),},
         { field: 'Slip', headerName: 'Slip', width: 200, renderCell: params => (
             <Button
-              variant="contained"
-              color="primary"
-              onClick={() => handleSlipButtonClick(params.row.Slip)}
+                size='small'
+                variant="contained"
+                color="primary"
+                onClick={() => handleSlipButtonClick(params.row.Slip)}
             >
               View Slip
             </Button>
           ),},
           { field: ' ', width: 200, renderCell: params => (
             <Button
-              variant="contained"
-              color="primary"
-              onClick={() => handleChangeSlipButtonClick(params.row.ID)}
+                size='small'
+                variant="contained"
+                color="primary"
+                onClick={() => handleChangeSlipButtonClick(params.row.ID)}
             >
               Change Slip
             </Button>
@@ -77,6 +79,7 @@ export default function My_Order_UI() {
         },
         { field: ' ', headerName: 'Shadowbanned check', width: 200, renderCell: params => (
             <Button
+                size='small'
                 variant="contained"
                 color="primary"
                 onClick={() => handleShadowbannedButtonClick(params.row.Twitter_Account)}
@@ -378,9 +381,9 @@ export default function My_Order_UI() {
                     </Box>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleDialogWatchClickClose}>Close</Button>
-                    <Button onClick={ExportAsTextFile} color="secondary" autoFocus>Export to Text file</Button>
-                    <Button onClick={CopyToClipboard} color="success" autoFocus>Copy to Clipboard</Button>
+                    <Button size='small' onClick={handleDialogWatchClickClose}>Close</Button>
+                    <Button size='small' onClick={ExportAsTextFile} color="secondary" autoFocus>Export to Text file</Button>
+                    <Button size='small' onClick={CopyToClipboard} color="success" autoFocus>Copy to Clipboard</Button>
                 </DialogActions>
             </Dialog>
 
@@ -400,7 +403,7 @@ export default function My_Order_UI() {
                     <img src={`${imageString}`} alt="Slip" width="100%" height="auto" />
                 </DialogContent>
                 <DialogActions>
-                <Button onClick={handleCloseSlipDialog} color="primary">
+                <Button size='small' onClick={handleCloseSlipDialog} color="primary">
                     Close
                 </Button>
                 </DialogActions>
@@ -423,8 +426,8 @@ export default function My_Order_UI() {
                     <input type="file" onChange={handleImageChange} />
                 </Grid>
                 <DialogActions>
-                    <Button onClick={handleCloseChangeSlipDialog} color="inherit">Cancel</Button>
-                    <Button onClick={PatchOrder} color="success" autoFocus>Save</Button>
+                    <Button size='small' onClick={handleCloseChangeSlipDialog} color="inherit">Cancel</Button>
+                    <Button size='small' onClick={PatchOrder} color="success" autoFocus>Save</Button>
                 </DialogActions>
             </Dialog> 
 

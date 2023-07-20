@@ -458,8 +458,8 @@ function User_Profile(){
                     </Box>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleDialogEditClickClose}>Cancel</Button>
-                    <Button onClick={EditUser} color="error" autoFocus>Update Data</Button>
+                    <Button size='small' onClick={handleDialogEditClickClose}>Cancel</Button>
+                    <Button size='small' onClick={EditUser} color="error" autoFocus>Update Data</Button>
                 </DialogActions>
             </Dialog>
 
@@ -511,8 +511,8 @@ function User_Profile(){
                     </Box>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleDialogEditPasswordClickClose}>Cancel</Button>
-                    <Button onClick={EditPasswordAccount} color="error" autoFocus>Change Password</Button>
+                    <Button size='small' onClick={handleDialogEditPasswordClickClose}>Cancel</Button>
+                    <Button size='small' onClick={EditPasswordAccount} color="error" autoFocus>Change Password</Button>
                 </DialogActions>
             </Dialog>
 
@@ -546,8 +546,8 @@ function User_Profile(){
                     </Box>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleDialogDeleteClickClose}>Cancel</Button>
-                    <Button onClick={DeleteAccount} color="error" autoFocus>Delete Password</Button>
+                    <Button size='small' onClick={handleDialogDeleteClickClose}>Cancel</Button>
+                    <Button size='small' onClick={DeleteAccount} color="error" autoFocus>Delete Password</Button>
                 </DialogActions>
             </Dialog>
         </Container></>
